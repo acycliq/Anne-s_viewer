@@ -122,9 +122,9 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu image_menu">
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_left")'>Image_One</a>
+                            <li><a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_left")'>Image_One</a>
                             </li>
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Image_Two</a>
+                            <li><a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_right")'>Image_Two</a>
                             </li>
                         </ul>
                     </li>
@@ -139,16 +139,28 @@
                         </a>
                         <ul class="dropdown-menu series_menu">
                             <li>
-                                <a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_left")'>Series_1</a>
+                                <a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_left")'>Series_1</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Series_2</a>
+                                <a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_right")'>Series_2</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Series_3</a>
+                                <a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_right")'>Series_3</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Series_4</a>
+                                <a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_right")'>Series_4</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item img2_series" href="#" onclick='console.log("161220KI_3-1_right")'>Series_5</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item img2_series"  href="#" onclick='console.log("161220KI_3-1_right")'>Series_6</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item img2_series" href="#" onclick='console.log("161220KI_3-1_right")'>Series_7</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item img2_series" href="#" onclick='console.log("161220KI_3-1_right")'>Series_8</a>
                             </li>
                         </ul>
                     </li>
@@ -241,6 +253,13 @@
         }
         // var series_num = d3.select('.series_toggle').node().innerText.trim();
         // var image_num = d3.select('.image_toggle').node().innerText.trim();
+        console.log('page is ' + value)
+        console.log('image num is ' + image_num)
+        console.log('series num is ' + series_num)
+        if (image_num=='Image_One' & ["Series_5", "Series_6", "Series_7", "Series_8"].includes(series_num)){
+            series_num = "Series_1"
+            d3.select('.series_toggle').html("Series_1 <span class=\"caret\"></span>");
+        }
         var dapi_arr = getFiles('dapi_pages', image_num, series_num);
         var lamin_arr = getFiles('lamin_pages', image_num, series_num);
         lamin_img.src = lamin_arr[value];
@@ -250,8 +269,15 @@
 
     $(".image_menu li a").click(function () {
         console.log('dropdown menu clicked');
+        $('.img2_series').hide();
+        if ($(this).text() === 'Image_Two'){
+            console.log('Image Two selected');
+            $('.img2_series').show();
+            // append_series()
+        }
         d3.select('.image_toggle').html($(this).text()+" <span class=\"caret\"></span>");
         setImage()
+
     });
 
     $(".series_menu li a").click(function () {
@@ -259,6 +285,26 @@
         d3.select('.series_toggle').html($(this).text()+" <span class=\"caret\"></span>");
         setImage()
     });
+
+    function append_series() {
+        var list = ["<li><a class='dropdown-item' href=''#' >Series_5</a> </li>",
+        "<li><a class='dropdown-item' href=''#' >Series_6</a> </li>",
+        "<li><a class='dropdown-item' href=''#' >Series_7</a> </li>",
+        "<li><a class='dropdown-item' href=''#' >Series_8</a> </li>",
+        ];
+        $.each(list, function (index, value) {
+            $(".series_menu").append($(value));
+        })
+    }
+
+
+    if (d3.select('.image_toggle').node().innerText.trim() === 'Image_One'){
+        $('.img2_series').hide();
+    }
+    if (d3.select('.image_toggle').node().innerText.trim() === 'Image_Two'){
+        $('.img2_series').show();
+    }
+
 </script>
 </body>
 
