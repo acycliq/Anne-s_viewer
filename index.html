@@ -201,7 +201,7 @@
 
 
     <div id="my_slider" class="center-block">
-        <input oninput="setImage(this)" onchange='setImage(this)' type="range" min="0" max="50" value="0" step="1" />
+        <input oninput="setImage(this.value)" onchange='setImage(this.value)' type="range" min="0" max="50" value="0" step="1" />
         <span id="range">0</span><span>/50</span>
     </div>
 
@@ -228,8 +228,8 @@
         return out
     }
 
-    function setImage(obj) {
-        var value = obj.value;
+    function setImage(value) {
+        // var value = obj.value;
         var series_num = d3.select('.series_toggle').node().innerText.trim();
         var image_num = d3.select('.image_toggle').node().innerText.trim();
         var dapi_arr = getFiles('dapi_pages', image_num, series_num);
