@@ -228,10 +228,19 @@
         return out
     }
 
-    function setImage(value) {
+    function setImage(value, image_num, series_num) {
         // var value = obj.value;
-        var series_num = d3.select('.series_toggle').node().innerText.trim();
-        var image_num = d3.select('.image_toggle').node().innerText.trim();
+        if (typeof value === 'undefined'){
+            value = document.getElementById("range").innerHTML
+        }
+        if (typeof image_num === 'undefined'){
+            image_num = d3.select('.image_toggle').node().innerText.trim();
+        }
+        if (typeof series_num === 'undefined'){
+            series_num = d3.select('.series_toggle').node().innerText.trim();
+        }
+        // var series_num = d3.select('.series_toggle').node().innerText.trim();
+        // var image_num = d3.select('.image_toggle').node().innerText.trim();
         var dapi_arr = getFiles('dapi_pages', image_num, series_num);
         var lamin_arr = getFiles('lamin_pages', image_num, series_num);
         lamin_img.src = lamin_arr[value];
@@ -242,11 +251,13 @@
     $(".image_menu li a").click(function () {
         console.log('dropdown menu clicked');
         d3.select('.image_toggle').html($(this).text()+" <span class=\"caret\"></span>");
+        setImage()
     });
 
     $(".series_menu li a").click(function () {
         console.log('dropdown menu clicked');
         d3.select('.series_toggle').html($(this).text()+" <span class=\"caret\"></span>");
+        setImage()
     });
 </script>
 </body>
