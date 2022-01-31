@@ -39,6 +39,10 @@
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
+    <!--d3 -->
+    <script src='https://d3js.org/d3.v4.min.js'></script>
+    <script src="./lib/js/d3-delaunay.min.js"></script>
+
     <!-- keen.io -->
     <link rel="stylesheet" href="./lib/css/keen-dashboards.css">
     <script src="./lib/js/keen.min.js"></script>
@@ -112,25 +116,45 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li class="dropdown" id="myDropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                        <a href="#" class="dropdown-toggle image_toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
-                            Select Data
+                            Image_One
                             <span class="caret"></span>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("default")'>default</a></li>
-
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_left")'>Image One</a>
+                        <ul class="dropdown-menu image_menu">
+                            <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_left")'>Image_One</a>
                             </li>
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Image two</a>
+                            <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Image_Two</a>
                             </li>
+                        </ul>
+                    </li>
+                </ul>
 
+                <ul class="nav navbar-nav">
+                    <li class="dropdown" id="myDropdown_2">
+                        <a href="#" class="dropdown-toggle series_toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            Series_1
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu series_menu">
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_left")'>Series_1</a>
                             </li>
-
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Series_2</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Series_3</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>Series_4</a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
             </div><!--/.nav-collapse -->
+
         </div><!--/.container-fluid -->
 
     </div>
@@ -150,7 +174,7 @@
                     <div class="chart-stage">
                         <div id="leafletmap">
 <!--                            <div id="mymap_1" style="width: 100%;"></div>-->
-                            <img id='dapi_img' src='data/series_1/dapi/page_000.jpg' />
+                            <img id='dapi_img' src='data/Image_One/series_1/dapi_pages/page_000.jpg' />
                         </div>
                     </div>
                 </div>
@@ -166,7 +190,7 @@
                     <div class="chart-stage">
                         <div id="leafletmap_1">
 <!--                            <div id="mymap_2" style="width: 100%;"></div>-->
-                            <img id='lamin_img' src='data/series_1/lamin/page_000.jpg' />
+                            <img id='lamin_img' src='data/Image_One/series_1/lamin_pages/page_000.jpg' />
                         </div>
                     </div>
                 </div>
@@ -194,11 +218,11 @@
 
     const zeroPad = (num, places) => String(num).padStart(places, '0');
 
-    function getFiles(stain, series_label){
+    function getFiles(stain, image_label, series_label){
         n = 51;
         out = [];
         for (var i = 0; i < n; i++){
-            var str = 'data/' + series_label + '/' + stain + '/page_' + zeroPad(i,3) + '.jpg';
+            var str = 'data/' + image_label + '/' + series_label + '/' + stain + '/page_' + zeroPad(i,3) + '.jpg';
             out.push(str)
         }
         return out
@@ -206,12 +230,24 @@
 
     function setImage(obj) {
         var value = obj.value;
-        var dapi_arr = getFiles('dapi', 'series_1');
-        var lamin_arr = getFiles('lamin', 'series_1');
+        var series_num = d3.select('.series_toggle').node().innerText.trim();
+        var image_num = d3.select('.image_toggle').node().innerText.trim();
+        var dapi_arr = getFiles('dapi_pages', image_num, series_num);
+        var lamin_arr = getFiles('lamin_pages', image_num, series_num);
         lamin_img.src = lamin_arr[value];
         dapi_img.src = dapi_arr[value];
         document.getElementById("range").innerHTML=value;
     }
+
+    $(".image_menu li a").click(function () {
+        console.log('dropdown menu clicked');
+        d3.select('.image_toggle').html($(this).text()+" <span class=\"caret\"></span>");
+    });
+
+    $(".series_menu li a").click(function () {
+        console.log('dropdown menu clicked');
+        d3.select('.series_toggle').html($(this).text()+" <span class=\"caret\"></span>");
+    });
 </script>
 </body>
 
