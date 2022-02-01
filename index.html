@@ -122,9 +122,9 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu image_menu">
-                            <li><a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_left")'>Image_One</a>
+                            <li><a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Image_One")'>Image_One</a>
                             </li>
-                            <li><a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_right")'>Image_Two</a>
+                            <li><a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Image_Two")'>Image_Two</a>
                             </li>
                         </ul>
                     </li>
@@ -139,28 +139,28 @@
                         </a>
                         <ul class="dropdown-menu series_menu">
                             <li>
-                                <a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_left")'>Series_1</a>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_1")'>Series_1</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_right")'>Series_2</a>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_2")'>Series_2</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_right")'>Series_3</a>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_3")'>Series_3</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick='console.log("161220KI_3-1_right")'>Series_4</a>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_4")'>Series_4</a>
                             </li>
                             <li>
-                                <a class="dropdown-item img2_series" href="#" onclick='console.log("161220KI_3-1_right")'>Series_5</a>
+                                <a class="dropdown-item img2_series" href="#" onclick='console.log("Dropdown menu selection: Series_5")'>Series_5</a>
                             </li>
                             <li>
-                                <a class="dropdown-item img2_series"  href="#" onclick='console.log("161220KI_3-1_right")'>Series_6</a>
+                                <a class="dropdown-item img2_series"  href="#" onclick='console.log("Dropdown menu selection: Series_6")'>Series_6</a>
                             </li>
                             <li>
-                                <a class="dropdown-item img2_series" href="#" onclick='console.log("161220KI_3-1_right")'>Series_7</a>
+                                <a class="dropdown-item img2_series" href="#" onclick='console.log("Dropdown menu selection: Series_7")'>Series_7</a>
                             </li>
                             <li>
-                                <a class="dropdown-item img2_series" href="#" onclick='console.log("161220KI_3-1_right")'>Series_8</a>
+                                <a class="dropdown-item img2_series" href="#" onclick='console.log("Dropdown menu selection: Series_8")'>Series_8</a>
                             </li>
                         </ul>
                     </li>
@@ -185,7 +185,6 @@
                     </div>
                     <div class="chart-stage">
                         <div id="leafletmap">
-<!--                            <div id="mymap_1" style="width: 100%;"></div>-->
                             <img id='dapi_img' src='data/Image_One/series_1/dapi_pages/page_000.jpg' />
                         </div>
                     </div>
@@ -201,7 +200,6 @@
                     </div>
                     <div class="chart-stage">
                         <div id="leafletmap_1">
-<!--                            <div id="mymap_2" style="width: 100%;"></div>-->
                             <img id='lamin_img' src='data/Image_One/series_1/lamin_pages/page_000.jpg' />
                         </div>
                     </div>
@@ -241,7 +239,6 @@
     }
 
     function setImage(value, image_num, series_num) {
-        // var value = obj.value;
         if (typeof value === 'undefined'){
             value = document.getElementById("range").innerHTML
         }
@@ -251,11 +248,11 @@
         if (typeof series_num === 'undefined'){
             series_num = d3.select('.series_toggle').node().innerText.trim();
         }
-        // var series_num = d3.select('.series_toggle').node().innerText.trim();
-        // var image_num = d3.select('.image_toggle').node().innerText.trim();
-        console.log('page is ' + value)
-        console.log('image num is ' + image_num)
-        console.log('series num is ' + series_num)
+        console.log('page is ' + value);
+        console.log('image num is ' + image_num);
+        console.log('series num is ' + series_num);
+
+        // Series 5, 6, 7, 8 do not exist in image 1. Default back to using Series 1
         if (image_num=='Image_One' & ["Series_5", "Series_6", "Series_7", "Series_8"].includes(series_num)){
             series_num = "Series_1"
             d3.select('.series_toggle').html("Series_1 <span class=\"caret\"></span>");
@@ -269,11 +266,12 @@
 
     $(".image_menu li a").click(function () {
         console.log('dropdown menu clicked');
+        // Hide the image 2 specific series
         $('.img2_series').hide();
         if ($(this).text() === 'Image_Two'){
+            // But show them if you have selected Image 2
             console.log('Image Two selected');
             $('.img2_series').show();
-            // append_series()
         }
         d3.select('.image_toggle').html($(this).text()+" <span class=\"caret\"></span>");
         setImage()
@@ -286,24 +284,13 @@
         setImage()
     });
 
-    function append_series() {
-        var list = ["<li><a class='dropdown-item' href=''#' >Series_5</a> </li>",
-        "<li><a class='dropdown-item' href=''#' >Series_6</a> </li>",
-        "<li><a class='dropdown-item' href=''#' >Series_7</a> </li>",
-        "<li><a class='dropdown-item' href=''#' >Series_8</a> </li>",
-        ];
-        $.each(list, function (index, value) {
-            $(".series_menu").append($(value));
-        })
-    }
 
-
-    if (d3.select('.image_toggle').node().innerText.trim() === 'Image_One'){
-        $('.img2_series').hide();
-    }
-    if (d3.select('.image_toggle').node().innerText.trim() === 'Image_Two'){
-        $('.img2_series').show();
-    }
+    // if (d3.select('.image_toggle').node().innerText.trim() === 'Image_One'){
+    //     $('.img2_series').hide();
+    // }
+    // if (d3.select('.image_toggle').node().innerText.trim() === 'Image_Two'){
+    //     $('.img2_series').show();
+    // }
 
 </script>
 </body>
