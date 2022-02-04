@@ -89,6 +89,16 @@
             margin-left: auto;
         }
 
+        input[type=checkbox]:hover {
+            box-shadow: 0px 0px 10px #1300ff;
+            font-family: 'Segoe UI';
+        }
+
+        /*input[type=checkbox]:hover + label {*/
+        /*    color: green;*/
+        /*    font-family: Consolas, Baskerville, 'Segoe UI', sans-serif;*/
+        /*}*/
+
     </style>
 
 </head>
@@ -154,6 +164,19 @@
                         </ul>
                     </li>
                 </ul>
+
+                <ul class="nav navbar-nav">
+                    <li class="dropdown" id="myDropdown_3">
+                        <a class="form-check">
+<!--                            <input id="checkbox" type="checkbox"/><label for="checkbox"> Click me</label>-->
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" onClick="updateText(this)">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                <span>Patch</span>
+                            </label>
+                        </a>
+                    </li>
+                </ul>
+
             </div><!--/.nav-collapse -->
 
         </div><!--/.container-fluid -->
@@ -174,7 +197,7 @@
                     </div>
                     <div class="chart-stage">
                         <div id="leafletmap">
-                            <img id='dapi_img' src='data/Image_One/Series_1/dapi_pages/page_000.jpg' />
+                            <img id='dapi_img' src='data/unpatched/Image_One/Series_1/dapi_pages/page_000.jpg' />
                         </div>
                     </div>
                 </div>
@@ -189,7 +212,7 @@
                     </div>
                     <div class="chart-stage">
                         <div id="leafletmap_1">
-                            <img id='lamin_img' src='data/Image_One/Series_1/lamin_pages/page_000.jpg' />
+                            <img id='lamin_img' src='data/unpatched/Image_One/Series_1/lamin_pages/page_000.jpg' />
                         </div>
                     </div>
                 </div>
@@ -214,19 +237,24 @@
     var lamin_img = document.getElementById('lamin_img');
     var dapi_img = document.getElementById('dapi_img');
 
+    function updateText(ckType){
+        ckType.checked? console.log('checkbox checked'): console.log('checkbox unchecked');
+        setImage()
+    }
+
     const zeroPad = (num, places) => String(num).padStart(places, '0');
 
-    function getFiles(stain, image_label, series_label){
+    function getFiles(stain, image_label, series_label, patch_label){
         n = 51;
         out = [];
         for (var i = 0; i < n; i++){
-            var str = 'data/' + image_label + '/' + series_label + '/' + stain + '/page_' + zeroPad(i,3) + '.jpg';
+            var str = 'data/' + patch_label + '/' + image_label + '/' + series_label + '/' + stain + '/resized_page_' + zeroPad(i,3) + '.jpg';
             out.push(str)
         }
         return out
     }
 
-    function setImage(value, image_num, series_num) {
+    function setImage(value, image_num, series_num, patch_label) {
         if (typeof value === 'undefined'){
             value = document.getElementById("range").innerHTML
         }
@@ -236,17 +264,27 @@
         if (typeof series_num === 'undefined'){
             series_num = d3.select('.series_toggle').node().innerText.trim();
         }
+        if (typeof patch === 'undefined'){
+            var cb = document.querySelector('#flexCheckDefault')
+            if (cb.checked) {
+                patch_label = 'patched'
+            }
+            else {
+                patch_label = 'unpatched'
+            }
+        }
         console.log('page is ' + value);
         console.log('image num is ' + image_num);
         console.log('series num is ' + series_num);
+        console.log('patch label is ' + patch_label);
 
         // Series 5, 6, 7, 8 do not exist in image 1. Default back to using Series 1
         if (image_num=='Image_One' & ["Series_5", "Series_6", "Series_7", "Series_8"].includes(series_num)){
             series_num = "Series_1"
             d3.select('.series_toggle').html("Series_1 <span class=\"caret\"></span>");
         }
-        var dapi_arr = getFiles('dapi_pages', image_num, series_num);
-        var lamin_arr = getFiles('lamin_pages', image_num, series_num);
+        var dapi_arr = getFiles('dapi_pages', image_num, series_num, patch_label);
+        var lamin_arr = getFiles('lamin_pages', image_num, series_num, patch_label);
         lamin_img.src = lamin_arr[value];
         dapi_img.src = dapi_arr[value];
         document.getElementById("range").innerHTML=value;
