@@ -197,7 +197,7 @@
                     </div>
                     <div class="chart-stage">
                         <div id="leafletmap">
-                            <img id='dapi_img' src='data/unpatched/Image_One/Series_1/dapi_pages/page_000.jpg' />
+                            <img id='dapi_img' src='data/unpatched/Image_One/Series_1/dapi_pages/resized_page_000.jpg' />
                         </div>
                     </div>
                 </div>
@@ -212,7 +212,7 @@
                     </div>
                     <div class="chart-stage">
                         <div id="leafletmap_1">
-                            <img id='lamin_img' src='data/unpatched/Image_One/Series_1/lamin_pages/page_000.jpg' />
+                            <img id='lamin_img' src='data/unpatched/Image_One/Series_1/lamin_pages/resized_page_000.jpg' />
                         </div>
                     </div>
                 </div>
@@ -290,6 +290,7 @@
         document.getElementById("range").innerHTML=value;
     }
 
+    $('.img2_series').hide(); // Hide by default the extra series when the page first loads
     $(".image_menu li a").click(function () {
         console.log('dropdown menu clicked');
         // Hide the image 2 specific series
