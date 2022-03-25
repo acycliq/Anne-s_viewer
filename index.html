@@ -21,7 +21,7 @@
 
     <meta charset='utf-8'>
 
-    <title>Anne's data</title>
+    <title>Anne's viewer</title>
 
     <!--jquery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
@@ -110,10 +110,10 @@
     <div class="container-fluid">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Anne's data</a>
+                <a class="navbar-brand" href="#">Anne's viewer</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+<!--                <ul class="nav navbar-nav">-->
 <!--                    <li class="dropdown" id="myDropdown">-->
 <!--                        <a href="#" class="dropdown-toggle image_toggle" data-toggle="dropdown" role="button" aria-haspopup="true"-->
 <!--                           aria-expanded="false">-->
@@ -127,43 +127,49 @@
 <!--                            </li>-->
 <!--                        </ul>-->
 <!--                    </li>-->
-                </ul>
+<!--                </ul>-->
 
-<!--                <ul class="nav navbar-nav">-->
-<!--                    <li class="dropdown" id="myDropdown_2">-->
-<!--                        <a href="#" class="dropdown-toggle series_toggle" data-toggle="dropdown" role="button" aria-haspopup="true"-->
-<!--                           aria-expanded="false">-->
-<!--                            Series_1-->
-<!--                            <span class="caret"></span>-->
-<!--                        </a>-->
-<!--                        <ul class="dropdown-menu series_menu">-->
-<!--                            <li>-->
-<!--                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_1")'>Series_1</a>-->
-<!--                            </li>-->
-<!--                            <li>-->
-<!--                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_2")'>Series_2</a>-->
-<!--                            </li>-->
-<!--                            <li>-->
-<!--                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_3")'>Series_3</a>-->
-<!--                            </li>-->
-<!--                            <li>-->
-<!--                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_4")'>Series_4</a>-->
-<!--                            </li>-->
-<!--                            <li>-->
-<!--                                <a class="dropdown-item img2_series" href="#" onclick='console.log("Dropdown menu selection: Series_5")'>Series_5</a>-->
-<!--                            </li>-->
-<!--                            <li>-->
-<!--                                <a class="dropdown-item img2_series"  href="#" onclick='console.log("Dropdown menu selection: Series_6")'>Series_6</a>-->
-<!--                            </li>-->
-<!--                            <li>-->
-<!--                                <a class="dropdown-item img2_series" href="#" onclick='console.log("Dropdown menu selection: Series_7")'>Series_7</a>-->
-<!--                            </li>-->
+                <ul class="nav navbar-nav">
+                    <li class="dropdown" id="myDropdown_2">
+                        <a href="#" class="dropdown-toggle series_toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            Series_1
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu series_menu">
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_1")'>Series_1</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_2")'>Series_2</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_3")'>Series_3</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_4")'>Series_4</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_5")'>Series_5</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"  href="#" onclick='console.log("Dropdown menu selection: Series_6")'>Series_6</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_7")'>Series_7</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_8")'>Series_8</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick='console.log("Dropdown menu selection: Series_9")'>Series_9</a>
+                            </li>
 <!--                            <li>-->
 <!--                                <a class="dropdown-item img2_series" href="#" onclick='console.log("Dropdown menu selection: Series_8")'>Series_8</a>-->
 <!--                            </li>-->
-<!--                        </ul>-->
-<!--                    </li>-->
-<!--                </ul>-->
+                        </ul>
+                    </li>
+                </ul>
 
                 <ul class="nav navbar-nav">
                     <li class="dropdown" id="myDropdown_3">
@@ -197,7 +203,7 @@
                     </div>
                     <div class="chart-stage">
                         <div id="leafletmap">
-                            <img id='dapi_img' src='data/B2A3/boundaries/resized_page_000.jpg' />
+                            <img id='dapi_img' src='data/atto425_DY520XL_MS002/series_4/boundaries_on/dapi_pages/resized_page_000.jpg' />
                         </div>
                     </div>
                 </div>
@@ -208,11 +214,11 @@
             <div class="col-sm-6">
                 <div class="chart-wrapper">
                     <div class="chart-title">
-                        Cell boundaries
+                        Lamin stain
                     </div>
                     <div class="chart-stage">
                         <div id="leafletmap_1">
-                            <img id='lamin_img' src='data/B2A3/dapi/resized_page_000.jpg' />
+                            <img id='lamin_img' src='data/atto425_DY520XL_MS002/Series_4/boundaries_on/lamin_pages/resized_page_000.jpg' />
                         </div>
                     </div>
                 </div>
@@ -223,8 +229,8 @@
 
 
     <div id="my_slider" class="center-block">
-        <input oninput="setImage(this.value)" onchange='setImage(this.value)' type="range" min="0" max="70" value="0" step="1" />
-        <span id="range">0</span><span>/70</span>
+        <input oninput="setImage(this.value)" onchange='setImage(this.value)' type="range" min="0" max="50" value="0" step="1" />
+        <span id="range">0</span><span>/50</span>
     </div>
 
 
@@ -244,32 +250,43 @@
 
     const zeroPad = (num, places) => String(num).padStart(places, '0');
 
-    function getFiles(label){
-        n = 71;
+    function getFiles(stain, image_label, series_label, boundariesFlag){
+        n = 51;
         out = [];
         for (var i = 0; i < n; i++){
-            var str = 'data/' + 'B2A3/' + label  + '/resized_page_' + zeroPad(i,3) + '.jpg';
+            var str = 'data' + '/' + image_label + '/' + series_label + '/' + boundariesFlag + '/' + stain + '/resized_page_' + zeroPad(i,3) + '.jpg';
             out.push(str)
         }
         return out
     }
 
-    function setImage(value) {
-        var cb = document.querySelector('#flexCheckDefault');
-        var boundaries_arr;
-
+    function setImage(value, image_name, series_num, boundariesFlag) {
         if (typeof value === 'undefined'){
             value = document.getElementById("range").innerHTML
         }
+        if (typeof image_name === 'undefined'){
+            image_name = 'atto425_DY520XL_MS002'
+        }
+        if (typeof series_num === 'undefined'){
+            series_num = d3.select('.series_toggle').node().innerText.trim();
+        }
+        if (typeof boundariesFlag === 'undefined'){
+            var cb = document.querySelector('#flexCheckDefault')
+            if (cb.checked) {
+                boundariesFlag = 'boundaries_off'
+            }
+            else {
+                boundariesFlag = 'boundaries_on'
+            }
+        }
+        console.log('page is ' + value);
+        console.log('image_name is ' + image_name);
+        console.log('series num is ' + series_num);
+        console.log('patch label is ' + boundariesFlag);
 
-        if (cb.checked) {
-            boundaries_arr = getFiles('dapi');
-        }
-        else{
-            boundaries_arr = getFiles('boundaries');
-        }
-        var dapi_arr = getFiles('dapi');
-        lamin_img.src = boundaries_arr[value];
+        var dapi_arr = getFiles('dapi_pages', image_name, series_num, boundariesFlag);
+        var lamin_arr = getFiles('lamin_pages', image_name, series_num, boundariesFlag);
+        lamin_img.src = lamin_arr[value];
         dapi_img.src = dapi_arr[value];
         document.getElementById("range").innerHTML=value;
     }
