@@ -120,9 +120,6 @@ def prepare_page(img, flag):
 
 def draw_page(page, boundaries, img, ppm, flag):
     polys = boundaries.coords.values
-    polys = np.array([
-        [[0, 0], [1, 0], [1, 1], [1, 0], [0, 0]]
-    ])
     colour = boundaries['colour'].values
     if len(polys) > 0:
         res = draw_poly(page, polys, colour, ppm)
