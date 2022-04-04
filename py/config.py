@@ -8,7 +8,7 @@ cellpose_ini = {
     # 'model_type': 'cyto', # cyto or nuclei
     # 'channels': [2, 1],  # IF YOU HAVE GREEN=cytoplasm and RED=nucleus
     'model_type': 'nuclei',  # cyto or nuclei
-    'channels': [0, 0],  # IF YOU HAVE G=cytoplasm and R=nucleus
+    'channels': [0, 0],  # IF YOU HAVE dapi only
     'diameter': 55.0,
     'batch_size': 2,
     'anisotropy': 1.0,
