@@ -28,7 +28,7 @@ atto425_DY520XL_MS002 = {
 }
 
 atto425_DY520XL_MS002_dapi_only = {
-    # Set this to the path to your 3d folder with the image series
+    # Set this to the path to your 3d dapi tiff
     'big_tif': os.path.join('E:\\', 'data', 'Anne', '220308 50umCF seq atto425 DY520XL MS002', 'matlab_output', 'background_image.tif'),
 
     # destination folder where results will be saved at
