@@ -1,5 +1,5 @@
 """
-Segments a 3D dapi image which has shape Z x 0 x Height x Width.
+Segments a 3D dapi image which has shape Z x Height x Width.
 """
 
 import skimage.io
@@ -232,7 +232,8 @@ def restore_shape(label_image, shape):
 
 
 def preprocess_img(img, ppm):
-    img = downsize_img(img, ppm)
+    if ppm != 1.0:
+        img = downsize_img(img, ppm)
     img = reshape_img(img)
     return img
 
