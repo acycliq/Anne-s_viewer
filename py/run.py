@@ -13,8 +13,8 @@ from cellpose import models
 import diplib as dip
 import os
 import torch
-import utils
-import config
+import py.utils as utils
+import py.config as config
 import logging
 
 
@@ -76,11 +76,11 @@ def normalize_img(img, normalize=[0,100]):
     return img
 
 
-def draw_poly(img, polys, colours, ppm):
+def draw_poly(img, polys, colours, shrink_factor):
     img2 = img.copy()
     draw = ImageDraw.Draw(img2)
     for i, poly in enumerate(polys):
-        poly = ppm * np.array(poly)
+        poly = shrink_factor * np.array(poly)
         poly = poly.tolist()
         poly = [tuple(d) for d in poly]
         draw.line(poly, fill=colours[i], width=3)
@@ -118,11 +118,11 @@ def prepare_page(img, flag):
     return out
 
 
-def draw_page(page, boundaries, img, ppm, flag):
+def draw_page(page, boundaries, img, shrink_factor, flag):
     polys = boundaries.coords.values
     colour = boundaries['colour'].values
     if len(polys) > 0:
-        res = draw_poly(page, polys, colour, ppm)
+        res = draw_poly(page, polys, colour, shrink_factor)
         res.save('cyto_page_2.jpg')
         rgb_arr = np.array(res)
         out = rgb_arr.transpose(2, 0, 1)  # rgb_arr is Ly, Lx, Lz
@@ -131,9 +131,9 @@ def draw_page(page, boundaries, img, ppm, flag):
     return out
 
 
-def populate_pages(boundaries, img, ppm, flag):
+def populate_pages(boundaries, img, shrink_factor, flag):
     page = prepare_page(img, flag)
-    out = draw_page(page, boundaries, img, ppm, flag)
+    out = draw_page(page, boundaries, img, shrink_factor, flag)
     return out.astype(np.int16)
 
 
@@ -147,7 +147,7 @@ def which_channel(stain_type):
     return out
 
 
-def draw_boundaries(masks, tif, ppm, stain_type):
+def draw_boundaries(masks, tif, shrink_factor, stain_type):
     c = 3  # three channels, rgb
     Lz, _, Ly, Lx = tif.shape
     out = np.zeros([Lz, c, Ly, Lx], dtype=np.int16)
@@ -158,18 +158,18 @@ def draw_boundaries(masks, tif, ppm, stain_type):
         boundaries['colour'] = utils.get_colour(boundaries.label.values)
         channel_id = which_channel(stain_type)
         img = normalize_img(tif[i, channel_id, :, :])  # channel:0 is dapi, channel: 1 the cytoplasm
-        out[i, :, :, :] = populate_pages(boundaries, img, ppm, stain_type)
+        out[i, :, :, :] = populate_pages(boundaries, img, shrink_factor, stain_type)
 
     return out
 
 
-def stack_to_images(filename, series_name, stain_type):
+def stack_to_images(filename, stain_type):
     dapi = skimage.io.imread(filename)
     n = dapi.shape[0]
     for i in range(n):
         page = dapi[i, :, :, :]
         img = Image.fromarray(page.astype(np.uint8), 'RGB')
-        target_file = os.path.join(os.path.join(cfg['segmented_cellpose'], series_name.split('.')[0], '%s_pages') % (stain_type), 'page_%s.jpg' % str(i).zfill(3))
+        target_file = os.path.join(os.path.join(cfg['segmented_cellpose'], '%s_pages') % (stain_type), 'page_%s.jpg' % str(i).zfill(3))
         if not os.path.exists(os.path.dirname(target_file)):
             os.makedirs(os.path.dirname(target_file))
         img.save(target_file)
@@ -177,7 +177,7 @@ def stack_to_images(filename, series_name, stain_type):
 
         scale = 0.5
         img_resized = img.resize([int(scale * s) for s in img.size], Image.ANTIALIAS)
-        target_file = os.path.join(os.path.join(cfg['segmented_cellpose'], series_name.split('.')[0], '%s_pages') % (stain_type), 'resized_page_%s.jpg' % str(i).zfill(3))
+        target_file = os.path.join(os.path.join(cfg['segmented_cellpose'], '%s_pages') % (stain_type), 'resized_page_%s.jpg' % str(i).zfill(3))
         img_resized.save(target_file)
         logger.info('resized_page_%d.jpg saved at %s' % (i, target_file))
 
@@ -220,13 +220,14 @@ def reshape_img(img):
     return out
 
 
-def resize_img(img, ppm):
+def resize_img(img, shrink_factor):
     z, Ly, Lx = img.shape
-    col = np.round(Ly/ppm)
-    row = np.round(Lx/ppm)
+    col = np.round(Ly/shrink_factor)
+    row = np.round(Lx/shrink_factor)
     out = skimage.transform.resize(img, (z, col, row))
     out = out * 65535
     return out.astype(np.uint16)
+
 
 def purge_channels(img):
     # Keep only channel 0 (this is the dapi) and channel 1 (this is lamin)
@@ -234,43 +235,41 @@ def purge_channels(img):
     return img[:, :2, :, :]
 
 
-def main(ppm, series_name, settings, use_stiching=False):
-    big_tif_path = os.path.join(settings['img_dir'], series_name)
-    # big_tif_path = settings['big_tif']
+def main(shrink_factor, settings, use_stiching=False):
+    big_tif_path = settings['big_tif']
 
     # For multi - channel, multi-Z tiff's, cellpose expects the image as Z x channels x Ly x Lx.
     _img = skimage.io.imread(big_tif_path) # this image has at the fist channel the cyto and at the second the nucleus
     _img = purge_channels(_img)
     # _img = _img[:, ::-1, :, :]  # reverse the order so that Red channel is the dapi and Green the cyto
-    # img = resize_img(_img, ppm)
+    # img = resize_img(_img, shrink_factor)
     masks = segment(_img, use_stiching)
-    dapi_boundaries = draw_boundaries(masks, _img, ppm, 'dapi')
-    lamin_boundaries = draw_boundaries(masks, _img, ppm, 'lamin')
+    dapi_boundaries = draw_boundaries(masks, _img, shrink_factor, 'dapi')
+    lamin_boundaries = draw_boundaries(masks, _img, shrink_factor, 'lamin')
 
     # save the 3d tif
-    dapi_target_file = os.path.join(settings['segmented_cellpose'], series_name.split('.')[0], 'cell_boundaries_dapi.tif')
+    dapi_target_file = os.path.join(settings['segmented_cellpose'], 'lamin_and_dapi', 'cell_boundaries_dapi.tif')
     if not os.path.exists(os.path.dirname(dapi_target_file)):
         os.makedirs(os.path.dirname(dapi_target_file))
     skimage.io.imsave(dapi_target_file, dapi_boundaries)
     logger.info('cell boundaries dapi saved at %s' % dapi_target_file)
 
-    lamin_target_file = os.path.join(settings['segmented_cellpose'], series_name.split('.')[0], 'cell_boundaries_lamin.tif')
+    lamin_target_file = os.path.join(settings['segmented_cellpose'], 'lamin_and_dapi', 'cell_boundaries_lamin.tif')
     if not os.path.exists(os.path.dirname(lamin_target_file)):
         os.makedirs(os.path.dirname(lamin_target_file))
     skimage.io.imsave(lamin_target_file, lamin_boundaries)
-    logger.info('cell boundaries dapi saved at %s' % lamin_target_file)
+    logger.info('cell boundaries lamin saved at %s' % lamin_target_file)
     return dapi_target_file, lamin_target_file
 
 
 if __name__ == "__main__":
     cfg = config.atto425_DY520XL_MS002
-    ppm = config.ppm  # pixels per micron
-    for series in cfg['series']:
-        dapi_target_file, lamin_target_file = main(ppm, series, cfg, use_stiching=True)
-        stack_to_images(dapi_target_file, series, 'dapi')
-        logger.info('ok, dapi done')
+    shrink_factor = config.shrink_factor
+    dapi_target_file, lamin_target_file = main(shrink_factor, cfg, use_stiching=True)
+    stack_to_images(dapi_target_file, 'dapi')
+    logger.info('ok, dapi done')
 
-        stack_to_images(lamin_target_file, series, 'lamin')
-        logger.info('ok, lamin done')
+    stack_to_images(lamin_target_file, 'lamin')
+    logger.info('ok, lamin done')
 
-        logger.info('ok, all done')
+    logger.info('ok, all done')
