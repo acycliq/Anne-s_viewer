@@ -2,7 +2,8 @@ import os
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-shrink_factor = 1  # How much to rescale the image by
+shrink_factor = 1  # How much to rescale the image by. For example if this is set to 2 then the original image will be
+                   # shrunk by a factor of 2 across X and Y amd then it will be fed to cellpose.
 
 cellpose_ini = {
     # 'model_type': 'cyto', # cyto or nuclei
