@@ -38,8 +38,8 @@ def extract_borders_dip(label_image, offset_x=0, offset_y=0, ignore_labels=[0]):
     Parameters
     ----------
     label_image: the segmentation mask, a 2-D array
-    offset_x: Determines how much the boundaries will be shifted by the on the x-axis
-    offset_y: Determines how much the boundaries will be shifted by the on the y-axis
+    offset_x: Determines how much the boundaries will be shifted by on the x-axis
+    offset_y: Determines how much the boundaries will be shifted by on the y-axis
     ignore_labels: list of integers. If you want to ignore some masks, put the corresponding label in this list
 
     Returns
@@ -76,12 +76,10 @@ def normalize_img(img, normalize=[0,100]):
     return img
 
 
-def draw_poly(img, polys, colours, shrink_factor):
+def draw_poly(img, polys, colours):
     img2 = img.copy()
     draw = ImageDraw.Draw(img2)
     for i, poly in enumerate(polys):
-        poly = shrink_factor * np.array(poly)
-        poly = poly.tolist()
         poly = [tuple(d) for d in poly]
         draw.line(poly, fill=colours[i], width=3)
         # img3 = Image.blend(img, img2, 0.4)
@@ -118,11 +116,11 @@ def prepare_page(img, flag):
     return out
 
 
-def draw_page(page, boundaries, img, shrink_factor, flag):
+def draw_page(page, boundaries, img, flag):
     polys = boundaries.coords.values
     colour = boundaries['colour'].values
     if len(polys) > 0:
-        res = draw_poly(page, polys, colour, shrink_factor)
+        res = draw_poly(page, polys, colour)
         res.save('cyto_page_2.jpg')
         rgb_arr = np.array(res)
         out = rgb_arr.transpose(2, 0, 1)  # rgb_arr is Ly, Lx, Lz
@@ -131,9 +129,9 @@ def draw_page(page, boundaries, img, shrink_factor, flag):
     return out
 
 
-def populate_pages(boundaries, img, shrink_factor, flag):
+def populate_pages(boundaries, img, flag):
     page = prepare_page(img, flag)
-    out = draw_page(page, boundaries, img, shrink_factor, flag)
+    out = draw_page(page, boundaries, img, flag)
     return out.astype(np.int16)
 
 
@@ -147,7 +145,7 @@ def which_channel(stain_type):
     return out
 
 
-def draw_boundaries(masks, tif, shrink_factor, stain_type):
+def draw_boundaries(masks, tif, stain_type):
     c = 3  # three channels, rgb
     Lz, _, Ly, Lx = tif.shape
     out = np.zeros([Lz, c, Ly, Lx], dtype=np.int16)
@@ -158,7 +156,7 @@ def draw_boundaries(masks, tif, shrink_factor, stain_type):
         boundaries['colour'] = utils.get_colour(boundaries.label.values)
         channel_id = which_channel(stain_type)
         img = normalize_img(tif[i, channel_id, :, :])  # channel:0 is dapi, channel: 1 the cytoplasm
-        out[i, :, :, :] = populate_pages(boundaries, img, shrink_factor, stain_type)
+        out[i, :, :, :] = populate_pages(boundaries, img, stain_type)
 
     return out
 
@@ -220,11 +218,11 @@ def reshape_img(img):
     return out
 
 
-def resize_img(img, shrink_factor):
-    z, Ly, Lx = img.shape
+def downsize_img(img, shrink_factor):
+    z, c, Ly, Lx = img.shape
     col = np.round(Ly/shrink_factor)
     row = np.round(Lx/shrink_factor)
-    out = skimage.transform.resize(img, (z, col, row))
+    out = skimage.transform.resize(img, (z, c, col, row))
     out = out * 65535
     return out.astype(np.uint16)
 
@@ -235,17 +233,49 @@ def purge_channels(img):
     return img[:, :2, :, :]
 
 
+def preprocess_img(img, shrink_factor):
+    # 1. keep only the first two channels
+    img = purge_channels(img)
+
+    # 2. downscale the image if needed
+    if shrink_factor != 1.0:
+        img = downsize_img(img, shrink_factor)
+    return img
+
+
+def restore_shape(label_image, shape):
+    z, h, w = label_image.shape
+    if tuple([w, h]) != shape:
+        masks = [np.array(Image.fromarray(d).resize(shape, Image.NEAREST)) for d in label_image]
+    else:
+        masks = label_image
+    return np.stack(masks)
+
+
+def postprocess(masks, shape):
+    """
+    shape must be (width, height)
+    """
+    out = restore_shape(masks, shape)
+    np.savez('masks_2D_stiched_fullsize.npz', out)
+    logger.info('Full sized masks saved to disk!')
+    return out
+
+
 def main(shrink_factor, settings, use_stiching=False):
     big_tif_path = settings['big_tif']
 
     # For multi - channel, multi-Z tiff's, cellpose expects the image as Z x channels x Ly x Lx.
-    _img = skimage.io.imread(big_tif_path) # this image has at the fist channel the cyto and at the second the nucleus
-    _img = purge_channels(_img)
+    img = skimage.io.imread(big_tif_path) # this image has at the fist channel the cyto and at the second the nucleus
+    z, c, h, w = img.shape
+
+    _img = preprocess_img(img, shrink_factor)
     # _img = _img[:, ::-1, :, :]  # reverse the order so that Red channel is the dapi and Green the cyto
-    # img = resize_img(_img, shrink_factor)
-    masks = segment(_img, use_stiching)
-    dapi_boundaries = draw_boundaries(masks, _img, shrink_factor, 'dapi')
-    lamin_boundaries = draw_boundaries(masks, _img, shrink_factor, 'lamin')
+    _masks = segment(_img, use_stiching)
+    masks = postprocess(_masks, (w, h))
+
+    dapi_boundaries = draw_boundaries(masks, img, 'dapi')
+    lamin_boundaries = draw_boundaries(masks, img, 'lamin')
 
     # save the 3d tif
     dapi_target_file = os.path.join(settings['segmented_cellpose'], 'lamin_and_dapi', 'cell_boundaries_dapi.tif')
