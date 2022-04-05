@@ -217,10 +217,10 @@ def reshape_img(img):
     return out.astype(np.uint16)
 
 
-def downsize_img(img, ppm):
+def downsize_img(img, shrink_factor):
     z, Ly, Lx = img.shape
-    col = np.round(Ly/ppm)
-    row = np.round(Lx/ppm)
+    col = np.round(Ly/shrink_factor)
+    row = np.round(Lx/shrink_factor)
     out = skimage.transform.resize(img, (z, col, row))
     out = out * 65535
     return out.astype(np.uint16)
@@ -231,9 +231,9 @@ def restore_shape(label_image, shape):
     return np.stack(masks)
 
 
-def preprocess_img(img, ppm):
-    if ppm != 1.0:
-        img = downsize_img(img, ppm)
+def preprocess_img(img, shrink_factor):
+    if shrink_factor != 1.0:
+        img = downsize_img(img, shrink_factor)
     img = reshape_img(img)
     return img
 
@@ -248,13 +248,13 @@ def postprocess(masks, shape):
     return out
 
 
-def main(ppm, settings, use_stiching=False):
+def main(shrink_factor, settings, use_stiching=False):
     big_tif_path = settings['big_tif']
 
     # For multi - channel, multi-Z tiff's, cellpose expects the image as Z x channels x Ly x Lx.
     img = skimage.io.imread(big_tif_path)
     z, h, w = img.shape
-    _img = preprocess_img(img, ppm)
+    _img = preprocess_img(img, shrink_factor)
     _masks = segment(_img, use_stiching)
     masks = postprocess(_masks, (w, h))
     dapi_boundaries = draw_boundaries(masks, img, 'dapi')
@@ -271,8 +271,8 @@ def main(ppm, settings, use_stiching=False):
 
 if __name__ == "__main__":
     cfg = config.atto425_DY520XL_MS002_dapi_only
-    ppm = config.ppm  # pixels per micron
-    dapi_target_file = main(ppm, cfg, use_stiching=True)
+    shrink_factor = config.shrink_factor  # pixels per micron
+    dapi_target_file = main(shrink_factor, cfg, use_stiching=True)
     stack_to_images(dapi_target_file, 'dapi')
     logger.info('ok, dapi done')
 
